@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="card mb-4">
+    <h4 class="mb-3">Dashboard Overview</h4>
+
+    <div class="row text-center">
+        <div class="col-md-3">
+            <div class="card p-3">
+                <h6>Total Tasks</h6>
+                <h2>{{ total }}</h2>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card p-3">
+                <h6>Pending</h6>
+                <h2 class="text-warning">{{ pending }}</h2>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card p-3">
+                <h6>Completed</h6>
+                <h2 class="text-success">{{ completed }}</h2>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card p-3">
+                <h6>Completion</h6>
+                <h2>{{ completion_rate }}%</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<a href="/" class="btn btn-primary">Back to Tasks</a>
+
+{% endblock %}

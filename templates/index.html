@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- =========================
+     ADD TASK SECTION
+========================= -->
+<div class="card mb-4">
+    <h5 class="mb-3">Add New Task</h5>
+
+    <form method="post" action="/add" class="row g-3">
+        <div class="col-md-6">
+            <input
+                type="text"
+                name="title"
+                class="form-control"
+                placeholder="Enter task title"
+                required
+            >
+        </div>
+
+        <div class="col-md-3">
+            <input
+                type="date"
+                name="due_date"
+                class="form-control"
+            >
+        </div>
+
+        <div class="col-md-3">
+            <select name="priority" class="form-select">
+                <option value="Medium">Medium Priority</option>
+                <option value="High">High Priority</option>
+                <option value="Low">Low Priority</option>
+            </select>
+        </div>
+
+        <div class="col-12">
+            <button class="btn btn-primary">
+                Add Task
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- =========================
+     FILTER TASKS SECTION
+========================= -->
+<div class="card mb-4">
+    <h5 class="mb-3">Filter Tasks</h5>
+
+    <form method="get" class="row g-3">
+        <!-- Status Filter -->
+        <div class="col-md-4">
+            <select name="status" class="form-select">
+                <option value="">All Status</option>
+                <option value="Pending"
+                    {% if request.args.get('status') == 'Pending' %}selected{% endif %}>
+                    Pending
+                </option>
+                <option value="Completed"
+                    {% if request.args.get('status') == 'Completed' %}selected{% endif %}>
+                    Completed
+                </option>
+            </select>
+        </div>
+
+        <!-- Priority Filter -->
+        <div class="col-md-4">
+            <select name="priority" class="form-select">
+                <option value="">All Priority</option>
+                <option value="High"
+                    {% if request.args.get('priority') == 'High' %}selected{% endif %}>
+                    High
+                </option>
+                <option value="Medium"
+                    {% if request.args.get('priority') == 'Medium' %}selected{% endif %}>
+                    Medium
+                </option>
+                <option value="Low"
+                    {% if request.args.get('priority') == 'Low' %}selected{% endif %}>
+                    Low
+                </option>
+            </select>
+        </div>
+
+        <!-- Overdue Filter -->
+        <div class="col-md-4">
+            <select name="overdue" class="form-select">
+                <option value="">All Tasks</option>
+                <option value="yes"
+                    {% if request.args.get('overdue') == 'yes' %}selected{% endif %}>
+                    Overdue Tasks
+                </option>
+            </select>
+        </div>
+
+        <div class="col-12">
+            <button class="btn btn-primary">
+                Apply Filters
+            </button>
+            <a href="/" class="btn btn-outline-secondary ms-2">
+                Reset
+            </a>
+        </div>
+    </form>
+</div>
+
+<!-- =========================
+     ACTIVE FILTERS DISPLAY
+========================= -->
+{% if request.args %}
+<div class="mb-3">
+    <strong>Active Filters:</strong>
+    {% for key, value in request.args.items() %}
+        <span class="badge bg-info text-dark me-1">
+            {{ key }}: {{ value }}
+        </span>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- =========================
+     TASK LIST
+========================= -->
+<div class="card">
+    <h5 class="mb-3">My Tasks</h5>
+
+    {% if tasks %}
+        {% for task in tasks %}
+        <div class="task-item">
+            <div>
+                <div class="task-title">
+                    {{ task.title }}
+                </div>
+
+                <div class="mt-1">
+                    <span class="task-status status-{{ task.status }}">
+                        {{ task.status }}
+                    </span>
+
+                    {% if task.priority %}
+                    <span class="badge bg-secondary ms-2">
+                        {{ task.priority }}
+                    </span>
+                    {% endif %}
+
+                    {% if task.due_date %}
+                    <span class="badge bg-light text-dark ms-2">
+                        Due: {{ task.due_date }}
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="d-flex gap-2">
+                <a href="/edit/{{ task.id }}" class="btn btn-warning btn-sm">
+                    Edit
+                </a>
+                <a href="/delete/{{ task.id }}" class="btn btn-danger btn-sm">
+                    Delete
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p class="text-muted">
+            No tasks found for the selected filters.
+        </p>
+    {% endif %}
+</div>
+
+{% endblock %}

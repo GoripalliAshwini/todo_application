@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="card">
+    <h4 class="mb-4">Task Analytics</h4>
+
+    <div class="row">
+        <div class="col-md-6 mx-auto">
+            <canvas id="taskChart"
+                    data-completed="{{ completed }}"
+                    data-pending="{{ pending }}">
+            </canvas>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const chartEl = document.getElementById("taskChart");
+
+    const completedCount = Number(chartEl.dataset.completed);
+    const pendingCount   = Number(chartEl.dataset.pending);
+
+    new Chart(chartEl, {
+        type: 'pie',
+        data: {
+            labels: ['Completed Tasks', 'Pending Tasks'],
+            datasets: [{
+                data: [completedCount, pendingCount],
+                backgroundColor: ['#22c55e', '#f59e0b']
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+</script>
+
+{% endblock %}

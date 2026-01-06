@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>Edit Task</h3>
+<form method="post">
+    <select name="status" class="form-control mb-2">
+        <option>Pending</option>
+        <option>Completed</option>
+    </select>
+    <button class="btn btn-success">Update</button>
+</form>
+{% endblock %}
