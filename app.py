@@ -7,7 +7,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from datetime import datetime
 EMAIL_ADDRESS = "sairakshivinju@gmail.com"
-EMAIL_PASSWORD = "hello"
+EMAIL_PASSWORD = "dudi xpfw xxkt hlxg"
 
 app = Flask(__name__)
 app.secret_key = "todo_secret"
@@ -101,27 +101,34 @@ def load_user(user_id):
 
 
 def send_email(to_email, task_title, due_date):
-    msg = MIMEMultipart()
-    msg["From"] = EMAIL_ADDRESS
-    msg["To"] = to_email
-    msg["Subject"] = "⏰ Task Overdue Reminder"
+    try:
+        msg = MIMEMultipart()
+        msg["From"] = EMAIL_ADDRESS
+        msg["To"] = to_email
+        msg["Subject"] = "⏰ Task Overdue Reminder"
 
-    body = f"""
-    Hello,
+        body = f"""
+Hello,
 
-    Your task "{task_title}" was due on {due_date}
-    and is still marked as pending.
+Your task "{task_title}" was due on {due_date}
+and is still marked as pending.
 
-    Please complete it as soon as possible.
+Please complete it as soon as possible.
 
-    — To-Do Application
-    """
-    msg.attach(MIMEText(body, "plain"))
+— To-Do Application
+"""
+        msg.attach(MIMEText(body, "plain"))
 
-    with smtplib.SMTP("smtp.gmail.com", 587) as server:
-        server.starttls()
-        server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
-        server.send_message(msg)
+        with smtplib.SMTP("smtp.gmail.com", 587) as server:
+            server.starttls()
+            server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+            server.send_message(msg)
+
+        print(f"✅ Email sent to {to_email}")
+
+    except Exception as e:
+        print("❌ Email error:", e)
+
 def check_overdue_tasks():
     conn = get_db()
     now = datetime.now().strftime("%Y-%m-%d")
@@ -141,15 +148,17 @@ def check_overdue_tasks():
             "UPDATE tasks SET reminder_sent = 1 WHERE id = ?",
             (task["id"],)
         )
+    print("⏰ Scheduler running...")
 
     conn.commit()
     conn.close()
 from apscheduler.schedulers.background import BackgroundScheduler
 
+from apscheduler.schedulers.background import BackgroundScheduler
+
 scheduler = BackgroundScheduler()
 scheduler.add_job(check_overdue_tasks, 'interval', minutes=1)
-if not app.config.get("TESTING"):
-    scheduler.start()
+
 
 
 # ---------------- ROUTES ----------------
@@ -185,14 +194,20 @@ def index():
 @login_required
 def add():
     title = request.form["title"]
+    due_date = request.form.get("due_date")
+    priority = request.form.get("priority", "Medium")
+
     conn = get_db()
-    conn.execute(
-        "INSERT INTO tasks (title, status, user_id) VALUES (?, ?, ?)",
-        (title, "Pending", current_user.id),
-    )
+    conn.execute("""
+        INSERT INTO tasks
+        (title, status, due_date, priority, reminder_sent, user_id)
+        VALUES (?, ?, ?, ?, 0, ?)
+    """, (title, "Pending", due_date, priority, current_user.id))
+
     conn.commit()
     conn.close()
     return redirect("/")
+
 
 @app.route("/delete/<int:id>")
 @login_required
@@ -223,7 +238,12 @@ def register():
         username = request.form["username"]
         password = generate_password_hash(request.form["password"])
         conn = get_db()
-        conn.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, password))
+        email = request.form["email"]
+        conn.execute(
+    "INSERT INTO users (username, password, email) VALUES (?, ?, ?)",
+    (username, password, email)
+)
+
         conn.commit()
         conn.close()
         flash("Registered successfully")
@@ -311,4 +331,6 @@ def dashboard():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    if not app.config.get("TESTING"):
+        scheduler.start()
+    app.run(debug=False)

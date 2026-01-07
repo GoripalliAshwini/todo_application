@@ -15,6 +15,9 @@
 </head>
 
 <body>
+<div id="loader">
+    <div class="spinner"></div>
+</div>
 
 <div class="app-container">
 
@@ -69,6 +72,9 @@
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url_for('static', filename='js/transition.js') }}"></script>
+<script src="{{ url_for('static', filename='js/tasks.js') }}"></script>
+<script src="{{ url_for('static', filename='js/loader.js') }}"></script>
 
 </body>
 </html>
